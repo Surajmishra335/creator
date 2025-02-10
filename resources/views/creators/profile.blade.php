@@ -110,6 +110,8 @@
                                     <h5>{{$yt_subscriber[auth()->user()->id]}} Subscribers</h5>
                                   @elseif ($social->id == 4)
                                   <h5>{{$insta_followers[auth()->user()->id]}} Followers</h5>
+                                  @elseif ($social->id == 5)
+                                  <h5>{{$twitter_followers[auth()->user()->id]}} Followers</h5>
                                   @else
                                     <h5>70+ Screens</h5>
                                   @endif

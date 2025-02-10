@@ -8,6 +8,7 @@ use App\Models\CreatorPlatform;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\InstagramChannel;
+use App\Models\TwitterChannels;
 use App\Models\YouTubeChannel;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -36,6 +37,12 @@ class ProfileController extends Controller
         ->first();
     
         $insta_followers = $insta_followers ? [$insta_followers->creator_id => $insta_followers->followers] : [];
+
+        $twitter_followers = TwitterChannels::where('creator_id', Auth::user()->id)
+        ->select('creator_id', 'followers')
+        ->first();
+    
+        $twitter_followers = $twitter_followers ? [$twitter_followers->creator_id => $twitter_followers->followers] : [];
     
         if($platforms){
             $existingPlatforms = explode(',', $platforms->platforms_ids);
@@ -44,7 +51,7 @@ class ProfileController extends Controller
             ->get();
         }
 
-        return view('creators.profile', compact('social_platforms', 'yt_subscriber', 'insta_followers'));
+        return view('creators.profile', compact('social_platforms', 'yt_subscriber', 'insta_followers', 'twitter_followers'));
     }
 
 

@@ -25,7 +25,7 @@ Route::middleware([\App\Http\Middleware\AuthMiddleware::class])->group(function 
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 
 
-    Route::get('/test', [CreatorPlatformController::class, 'getTwitterFollowers'])->name('test');
+    Route::get('/test', [CreatorPlatformController::class, 'getUserMetrics'])->name('test');
     
     Route::get('/social-platform-add', [CreatorPlatformController::class, 'create'])->name('social-platform-create');
     Route::post('/social-platform-add', [CreatorPlatformController::class, 'store'])->name('social-platform-add');

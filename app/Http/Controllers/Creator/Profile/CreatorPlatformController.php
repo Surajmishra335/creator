@@ -10,6 +10,7 @@ use App\Models\InstagramChannel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\TwitterChannels;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
@@ -103,6 +104,19 @@ class CreatorPlatformController extends Controller
             $followerCount = $this->getInstagramFollowers($request->profile_url);
             if ($followerCount !== null) {
                 InstagramChannel::updateOrCreate(
+                    ['creator_id' => $creator_id],
+                    [
+                        'profile_url' => $request->profile_url,
+                        'followers' => $followerCount
+                    ],
+                );
+            }
+        }
+
+        if ($request->platforms_id == 5) {
+            $followerCount = $this->getTwitterFollowers($request->profile_url);
+            if ($followerCount !== null) {
+                TwitterChannels::updateOrCreate(
                     ['creator_id' => $creator_id],
                     [
                         'profile_url' => $request->profile_url,
@@ -282,41 +296,45 @@ class CreatorPlatformController extends Controller
         }
     }
 
-    public function getTwitterFollowers()
+    public function getTwitterFollowers($profileUrl)
     {
-        $username = "surajmishra335";
-        $url = "https://twitter.com/{$username}"; // Construct Twitter URL
+
+        $pattern = '/twitter\.com\/([a-zA-Z0-9_]+)|x\.com\/([a-zA-Z0-9_]+)/';
+        preg_match($pattern, $profileUrl, $matches);
+
+        // Handle both twitter.com and x.com URLs
+        $username = $matches[1] ?? $matches[2] ?? null;
+
+        if (!$username) {
+            return "0";
+        }
+
+        $bearerToken = env('TWITTER_BEARER_TOKEN');
 
         $client = new Client();
+
         try {
-            $response = $client->get($url);
-            $html = $response->getBody();
+            $response = $client->get("https://api.twitter.com/2/users/by/username/{$username}", [
+                'headers' => [
+                    'Authorization' => "Bearer {$bearerToken}",
+                    'Accept' => 'application/json',
+                ],
+                'query' => [
+                    'user.fields' => 'public_metrics'
+                ]
+            ]);
 
-            $crawler = new Crawler($html);
+            $data = json_decode($response->getBody(), true);
+            if (isset($data['data']['public_metrics'])) {
 
-            $followerCountElement = $crawler->filter('[data-testid="userFollowerCount"]')->text();
-
-            if ($followerCountElement) {
-                // Remove any extra text or spaces and convert to number
-                $followerCount = preg_replace('/[^0-9]/', '', $followerCountElement); // Remove non-numeric characters
-                $followerCount = (int)$followerCount;
-
-                 // Save or update the data in the database
-                 $twitterProfile = TwitterProfile::updateOrCreate(
-                    ['username' => $username], // Find or create based on username
-                    ['followers_count' => $followerCount] // Update the follower count
-                );
-
-                return response()->json(['username' => $username, 'followers' => $followerCount]);
-            } else {
-                $followerCount = "Follower count not found. Inspect Twitter's HTML.";
-                return response()->json(['username' => $username, 'followers' => $followerCount, 'error' => 'count_not_found'], 404);
+                return  $data['data']['public_metrics']['followers_count'];
             }
 
-
+            return "0";
 
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+            Log::error($e);
+            return "0";
         }
     }
 
