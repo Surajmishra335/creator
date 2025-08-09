@@ -13,7 +13,7 @@ Route::post('/register', [RegisterController::class, 'register']);
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('loginDashboard');
 
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 
 
 
@@ -25,7 +25,7 @@ Route::middleware([\App\Http\Middleware\AuthMiddleware::class])->group(function 
     Route::put('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 
 
-    Route::get('/test', [CreatorPlatformController::class, 'getUserMetrics'])->name('test');
+    Route::get('/test', [CreatorPlatformController::class, 'getFollowers'])->name('test');
     
     Route::get('/social-platform-add', [CreatorPlatformController::class, 'create'])->name('social-platform-create');
     Route::post('/social-platform-add', [CreatorPlatformController::class, 'store'])->name('social-platform-add');
