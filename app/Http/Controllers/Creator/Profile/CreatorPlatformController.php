@@ -6,18 +6,18 @@ use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use App\Models\YouTubeChannel;
 use App\Models\CreatorPlatform;
+use App\Models\TwitterChannels;
 use App\Models\InstagramChannel;
 use Illuminate\Support\Facades\DB;
+use function Laravel\Prompts\error;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Models\TwitterChannels;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Config;
+
+use GuzzleHttp\Exception\ClientException;
 use Symfony\Component\DomCrawler\Crawler;
-
-
-
 
 class CreatorPlatformController extends Controller
 {
@@ -88,7 +88,6 @@ class CreatorPlatformController extends Controller
 
         if ($request->platforms_id == 3) {
             $subscriberCount = $this->getYouTubeChannelStatistics($request->profile_url);
-            log::info($subscriberCount['subscriberCount']);
             if ($subscriberCount !== null) {
                 YouTubeChannel::updateOrCreate(
                     ['creator_id' => $creator_id],
@@ -97,6 +96,8 @@ class CreatorPlatformController extends Controller
                         'subscribers' => $subscriberCount['subscriberCount']
                     ],
                 );
+            }else{
+                return response()->json(['error' => 'somethig went wrong'], 422);
             }
         }
 
@@ -336,6 +337,98 @@ class CreatorPlatformController extends Controller
             Log::error($e);
             return "0";
         }
+    }
+
+
+    public function getFacebookFollowers()
+    {
+        // Set your App ID and App Secret
+        $appId = '987146019975920';
+        $appSecret = '64db0d476117522d19a2b0e9c5ccfb77';
+
+        // Set the page ID or username
+        $pageId = 'thatsMC';
+
+        // Set the API endpoint and parameters
+        $endpoint = "https://graph.facebook.com/v13.0/$pageId?fields=followers&access_token=$appId|$appSecret";
+
+        // Create a new Guzzle client
+        $client = new Client();
+
+        try {
+            // Make a GET request to the API endpoint
+            $response = $client->get($endpoint);
+
+            // Get the response data
+            $data = json_decode($response->getBody()->getContents(), true);
+
+            // Get the follower count
+            $followerCount = $data['followers']['summary']['total_count'];
+
+            // Return the follower count
+            return response()->json(['follower_count' => $followerCount]);
+        } catch (ClientException $e) {
+            // Catch the exception and return a meaningful error message
+            $errorMessage = $e->getResponse()->getBody()->getContents();
+            return response()->json(['error' => $errorMessage], 400);
+        }
+    }
+
+    public function getFollowers(Request $request)
+    {
+        $url = "https://www.facebook.com/Surajkrmishra/";
+
+       // Validate the URL
+            if (!filter_var($url, FILTER_VALIDATE_URL)) {
+                return response()->json(['error' => 'Invalid URL'], 422);
+            }
+
+            // Use curl to fetch the page content
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3');
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+            if (curl_errno($ch)) {
+                return response()->json(['error' => 'cURL error: ' . curl_error($ch)], 500);
+            }
+
+            curl_close($ch);
+
+            // Check if the request was successful
+            if ($httpCode !== 200) {
+                return response()->json(['error' => 'Failed to fetch page content', 'http_code' => $httpCode], 500);
+            }
+
+            // Parse the HTML content using DOMDocument
+            $dom = new DOMDocument();
+            @$dom->loadHTML($response);
+            $xpath = new DOMXPath($dom);
+
+            // Assuming the followers count is in an element with the class 'followers-count'
+            $followersCount = $xpath->query('.//div[@class="followers-count"]')->item(0)->nodeValue;
+
+            // Return the followers count as JSON
+            return response()->json(['followers' => $followersCount]);
+    }
+
+    private function extractFacebookIdentifier($url)
+    {
+        $patterns = [
+            '/facebook\.com\/(?:profile\.php\?id=)?(\d+)/', // Profile ID
+            '/facebook\.com\/(?:pages\/[^\/]+\/)?(\d+)/', // Page ID
+            '/facebook\.com\/([a-zA-Z0-9\.]+)/', // Username
+            '/fb\.com\/([a-zA-Z0-9\.]+)/' // Short URL
+        ];
+
+        foreach ($patterns as $pattern) {
+            preg_match($pattern, $url, $matches);
+            if (!empty($matches[1])) {
+                return $matches[1];
+            }
+        }
+        return null;
     }
 
 

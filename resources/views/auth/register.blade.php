@@ -65,13 +65,13 @@
                                         class="row g-3 needs-validation" novalidate>
                                         @csrf
                                         <div class="col-12">
-                                            <label for="yourName" class="form-label">Your Name</label>
+                                            <label for="yourName" class="form-label">Name</label>
                                             <input type="text" name="name" class="form-control" id="name" value="{{old('name')}}" required>
                                             <div class="invalid-feedback">Please, enter your name!</div>
                                         </div>
 
                                         <div class="col-12">
-                                            <label for="yourEmail" class="form-label">Your Email</label>
+                                            <label for="yourEmail" class="form-label">Email</label>
                                             <input type="email" name="email" class="form-control" id="email" value="{{ old('email') }}" required>
                                             <div class="invalid-feedback">Please enter a valid Email adddress!</div>
                                         </div>
@@ -90,12 +90,20 @@
                                             <div class="invalid-feedback">Please enter your password!</div>
                                         </div>
 
-                                        {{-- <div class="col-12">
-                                            <label for="yourPassword" class="form-label">Phone</label>
-                                            <input type="text" name="phone_number" class="form-control"
-                                                id="phone_number" required>
-                                            <div class="invalid-feedback">Please enter your password!</div>
-                                        </div> --}}
+                                        <div class="col-12">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="user_role" id="user_role_creator" value="1">
+                                                <label class="form-check-label" for="user_role_creator">
+                                                    I am a creator
+                                                </label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="user_role" id="user_role_client" value="2">
+                                                <label class="form-check-label" for="user_role_client">
+                                                    I am looking for a creator
+                                                </label>
+                                            </div>
+                                        </div>
 
                                         <div class="col-12">
                                             <div class="form-check">
