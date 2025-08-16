@@ -2,9 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\Creator\Profile\ProfileController;
-use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Brand\FindCreatorController;
+use App\Http\Controllers\Creator\Profile\ProfileController;
 use App\Http\Controllers\Creator\Profile\CreatorPlatformController;
 
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
@@ -30,3 +31,5 @@ Route::middleware([\App\Http\Middleware\AuthMiddleware::class])->group(function 
     Route::get('/social-platform-add', [CreatorPlatformController::class, 'create'])->name('social-platform-create');
     Route::post('/social-platform-add', [CreatorPlatformController::class, 'store'])->name('social-platform-add');
 });
+
+Route::get('/find-creator', [FindCreatorController::class, 'index'])->name('find-creator');
