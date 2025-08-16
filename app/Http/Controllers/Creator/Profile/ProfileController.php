@@ -43,7 +43,7 @@ class ProfileController extends Controller
         ->first();
     
         $twitter_followers = $twitter_followers ? [$twitter_followers->creator_id => $twitter_followers->followers] : [];
-    
+        $social_platforms = [];
         if($platforms){
             $existingPlatforms = explode(',', $platforms->platforms_ids);
             $social_platforms = DB::table('social_platforms_master')

@@ -41,6 +41,10 @@
         <link href="{{ asset('creator/public/assets/vendor/remixicon/remixicon.css') }}" rel="stylesheet">
         <link href="{{ asset('creator/public/assets/vendor/simple-datatables/style.css') }}" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta3/css/bootstrap-select.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+
+
 
 
         <!-- Template Main CSS File -->

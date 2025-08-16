@@ -23,11 +23,16 @@
 <script src="{{ asset('creator/public/assets/vendor/simple-datatables/simple-datatables.js') }}"></script>
 <script src="{{ asset('creator/public/assets/vendor/tinymce/tinymce.min.js') }}"></script>
 <script src="{{ asset('creator/public/assets/vendor/php-email-form/validate.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta3/js/bootstrap-select.min.js"></script>
+
 
 <!-- Template Main JS File -->
 <script src="{{ asset('creator/public/assets/js/main.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
+<!-- Page-specific scripts will be pushed here -->
+@stack('scripts')
 
 <script>
     
@@ -51,6 +56,8 @@
     });
 
 </script>
+
+
 
 
     
